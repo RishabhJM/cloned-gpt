@@ -11,6 +11,7 @@ import { v4 as uuid } from "uuid";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { BallTriangle } from "react-loader-spinner";
 
 const supabaseUrl = "https://xcnsfjtsufywoloplzac.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -90,7 +91,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       return newChatMessages;
     });
     setMessageText("");
-    console.log("MESSAGE_TEXT",messageText);
+    console.log("MESSAGE_TEXT", messageText);
     //console.log("NEW CHAT: ", json);
     const response = await fetch(`/api/chat/testChat`, {
       method: "POST",
@@ -169,6 +170,20 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                       content="Only one message at a time. Please allow any other responses to complete before sending another message"
                     />
                   )}
+                  {generatingResponse && (
+                    <div className="flex justify-center">
+                      <BallTriangle
+                        height={100}
+                        width={100}
+                        radius={5}
+                        color="#4fa94d"
+                        ariaLabel="ball-triangle-loading"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                        visible={true}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -195,7 +210,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       ) : (
         <div>
           <h1>You are not logged in, Please Login!</h1>
-          <button onClick={()=> router.push("/")}>Go back to Home Page</button>
+          <button onClick={() => router.push("/")}>Go back to Home Page</button>
         </div>
       )}
     </>
