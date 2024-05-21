@@ -5,14 +5,14 @@ const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_KEY);
 
 const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-// export const config = {
-//   runtime: "edge",
-// };
+export const config = {
+  runtime: "edge",
+};
 
 export default async function handler(req,res) {
   console.log("IN HERE!");
   try {
-    const { chatId: chatIdFromParam, message, userId } = await req.body;
+    const { chatId: chatIdFromParam, message, userId } = await req.json();
     console.log(message,userId);
     // validate message data
     if (!message || typeof message !== "string" || message.length > 200) {

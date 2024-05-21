@@ -9,7 +9,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   try {
-    // const { user } = await getSession(req, res);
     const { userId, message } = req.body;
 
     // validate message data
@@ -24,17 +23,16 @@ export default async function handler(req, res) {
       role: "user",
       content: message,
     };
-
     const { data, error } = await supabase.from("chats").insert({
-      userId: userId,
-      messages: [newUserMessage],
+      userID: userId,
+      messages: [JSON.stringify(newUserMessage)],
       title: message,
     }).select();
     res.status(200).json({
-      id: data.id,
-      userId:data.userId,
-      messages: data.messages,
-      title: data.title,
+      id: data[0].id,
+      userId:data[0].userID,
+      messages: data[0].messages,
+      title: data[0].title,
     });
   } catch (e) {
     res

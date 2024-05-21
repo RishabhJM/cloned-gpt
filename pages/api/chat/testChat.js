@@ -13,10 +13,25 @@ export default async function handler(req, res) {
   // res.status(200).json({ message: 'Hello from Next.js!' });
   console.log("IN HERE!");
   try {
-    console.log("REQ",req.body)
+    console.log("REQ", req.body);
     const { message } = await req.body;
-    console.log("MESSAGE",message);
-
+    console.log("MESSAGE", message);
+    // const chat = model.startChat({
+    //   history: [
+    //     {
+    //       role: "user",
+    //       parts:
+    //         "You are",
+    //     },
+    //     {
+    //       role: "model",
+    //       parts: "Hello! It's cold! Isn't that great?",
+    //     },
+    //   ],
+    //   generationConfig: {
+    //     maxOutputTokens: 100,
+    //   },
+    // });
     const result = await model.generateContent(message);
     // const result = await model.generateContentStream(message);
     // console.log(result);
