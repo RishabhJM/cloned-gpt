@@ -7,13 +7,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default async function handler(req, res) {
   try {
     const { userId } = req.body;
-    console.log(userId);
     const { data, error } = await supabase
       .from("chats")
       .select("id,title")
       .eq('userID', userId)
       .order("created_at", { ascending: false });
-      console.log(data,error);
     res.status(200).json({ chats:data });
   } catch (e) {
     res

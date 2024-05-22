@@ -194,11 +194,11 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder={generatingResponse ? "" : "Send a message..."}
-                    className="w-full resize-none rounded-lg bg-gray-700 p-2 text-white focus:border-emerald-500 focus:bg-gray-600 focus:outline focus:outline-emerald-500"
+                    className="w-full resize-none rounded-[12px] bg-gray-700 p-2 text-white focus:border-emerald-500 focus:bg-gray-600 focus:outline focus:outline-emerald-500"
                   />
                   <button
                     type="submit"
-                    className="rounded-md bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600 disabled:bg-emerald-300;"
+                    className="btn"
                   >
                     Send
                   </button>
@@ -217,49 +217,49 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   );
 }
 
-export const getServerSideProps = async (ctx) => {
-  const chatId = ctx.params?.chatId?.[0] || null;
-  if (chatId) {
-    let objectId;
+// export const getServerSideProps = async (ctx) => {
+//   const chatId = ctx.params?.chatId?.[0] || null;
+//   if (chatId) {
+//     let objectId;
 
-    try {
-      objectId = new ObjectId(chatId);
-    } catch (e) {
-      return {
-        redirect: {
-          destination: "/chat",
-        },
-      };
-    }
+//     try {
+//       objectId = new ObjectId(chatId);
+//     } catch (e) {
+//       return {
+//         redirect: {
+//           destination: "/chat",
+//         },
+//       };
+//     }
 
-    const { user } = await getSession(ctx.req, ctx.res);
-    const client = await clientPromise;
-    const db = client.db("ChattyPete");
-    const chat = await db.collection("chats").findOne({
-      userId: user.sub,
-      _id: objectId,
-    });
+//     const { user } = await getSession(ctx.req, ctx.res);
+//     const client = await clientPromise;
+//     const db = client.db("ChattyPete");
+//     const chat = await db.collection("chats").findOne({
+//       userId: user.sub,
+//       _id: objectId,
+//     });
 
-    if (!chat) {
-      return {
-        redirect: {
-          destination: "/chat",
-        },
-      };
-    }
+//     if (!chat) {
+//       return {
+//         redirect: {
+//           destination: "/chat",
+//         },
+//       };
+//     }
 
-    return {
-      props: {
-        chatId,
-        title: chat.title,
-        messages: chat.messages.map((message) => ({
-          ...message,
-          _id: uuid(),
-        })),
-      },
-    };
-  }
-  return {
-    props: {},
-  };
-};
+//     return {
+//       props: {
+//         chatId,
+//         title: chat.title,
+//         messages: chat.messages.map((message) => ({
+//           ...message,
+//           _id: uuid(),
+//         })),
+//       },
+//     };
+//   }
+//   return {
+//     props: {},
+//   };
+// };
