@@ -54,7 +54,6 @@ export default function Login() {
       console.log("SESSION INITIALIZED");
     } else if (event === "SIGNED_IN") {
       // handle sign in event
-      console.log("Signed IN");
       router.push("/chat");
     }
   });

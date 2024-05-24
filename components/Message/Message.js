@@ -30,7 +30,6 @@ export const Message = ({ user, role, content }) => {
         )}
         {role === "assistant" && (
           <div className="flex h-[30px] w-[30px] items-center justify-center rounded-sm bg-gray-800 shadow-md shadow-black/50">
-            {/* <FontAwesomeIcon icon={faRobot} className="text-emerald-200" /> */}
             <Image src="/logo2.png" width={30} height={30} alt=""></Image>
           </div>
         )}

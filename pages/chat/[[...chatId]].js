@@ -32,6 +32,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
 
   const routeHasChanged = chatId !== originalChatId;
 
+  //gets logged in user data from supabase
   useEffect(() => {
     async function getUserData() {
       await supabase.auth.getUser().then((value) => {
@@ -55,15 +56,8 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   // save the newly streamed message to new chat messages
   useEffect(() => {
     if (!routeHasChanged && !generatingResponse && fullMessage) {
-      console.log("NEW CHAT",newChatMessages);
-      setNewChatMessages((prev) => [
-        ...prev,
-        {
-          id: uuid(),
-          role: "assistant",
-          content: fullMessage,
-        },
-      ]);
+      console.log("NEW CHAT", newChatMessages);
+      setNewChatMessages((prev) => [...prev]);
       setFullMessage("");
     }
   }, [generatingResponse, fullMessage, routeHasChanged]);
@@ -81,19 +75,11 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     setGeneratingResponse(true);
     setOriginalChatId(chatId);
     setNewChatMessages((prev) => {
-      const newChatMessages = [
-        ...prev,
-        {
-          id: uuid(),
-          role: "user",
-          content: messageText,
-        },
-      ];
+      const newChatMessages = [...prev];
       return newChatMessages;
     });
     setMessageText("");
-    console.log("MESSAGE_TEXT", messageText);
-    //console.log("NEW CHAT: ", json);
+    setIncomingMessage(messageText);
     const response = await fetch(`/api/chat/sendMessage`, {
       method: "POST",
       headers: {
@@ -102,10 +88,8 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       body: JSON.stringify({ message: messageText, userId: userId, chatId }),
     });
     const data = response.body;
-    console.log("DATA", data);
     const text = await response.json();
     setNewChatId(text.chatId);
-    console.log("TEXT FE", text);
     if (!data) {
       return;
     }
@@ -115,7 +99,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   };
 
   const allMessages = [...messages, ...newChatMessages];
-  console.log("ALL MESSAGES",allMessages);
+  // console.log("ALL MESSAGES",allMessages);
 
   return (
     <>
@@ -153,7 +137,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                     />
                   ))}
                   {!!incomingMessage && !routeHasChanged && (
-                    <Message role="assistant" content={incomingMessage} />
+                    <Message role="user" content={incomingMessage} user={user}/>
                   )}
                   {!!incomingMessage && !!routeHasChanged && (
                     <Message
@@ -212,8 +196,10 @@ export const getServerSideProps = async (ctx) => {
       .from("chats")
       .select()
       .eq("id", chatId);
-    const messagesArray = data[0].messages.map((message) => (JSON.parse(message)));
-    console.log("DATA RJM",messagesArray);
+    const messagesArray = data[0].messages.map((message) =>
+      JSON.parse(message)
+    );
+    console.log("DATA RJM", messagesArray);
     if (!data) {
       return {
         redirect: {
