@@ -31,6 +31,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const router = useRouter();
 
   const routeHasChanged = chatId !== originalChatId;
+  console.log(routeHasChanged);
 
   //gets logged in user data from supabase
   useEffect(() => {
@@ -57,7 +58,14 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   useEffect(() => {
     if (!routeHasChanged && !generatingResponse && fullMessage) {
       console.log("NEW CHAT", newChatMessages);
-      setNewChatMessages((prev) => [...prev]);
+      setNewChatMessages((prev) => [
+        ...prev,
+        {
+          _id: uuid(),
+          role: "assistant",
+          content: fullMessage,
+        },
+      ]);
       setFullMessage("");
     }
   }, [generatingResponse, fullMessage, routeHasChanged]);
@@ -73,9 +81,17 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneratingResponse(true);
+    console.log(chatId);
     setOriginalChatId(chatId);
     setNewChatMessages((prev) => {
-      const newChatMessages = [...prev];
+      const newChatMessages = [
+        ...prev,
+        {
+          _id: uuid(),
+          role: "user",
+          content: messageText,
+        },
+      ];
       return newChatMessages;
     });
     setMessageText("");
@@ -136,8 +152,16 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                       user={user}
                     />
                   ))}
-                  {!!incomingMessage && !routeHasChanged && (
-                    <Message role="user" content={incomingMessage} user={user}/>
+                  {!!incomingMessage && (chatId) && (
+                    <div>
+                      RISHABH
+                      <Message
+                      role="user"
+                      content={incomingMessage}
+                      user={user}
+                    />
+                    </div>
+                    
                   )}
                   {!!incomingMessage && !!routeHasChanged && (
                     <Message
