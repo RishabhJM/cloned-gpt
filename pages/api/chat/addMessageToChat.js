@@ -1,7 +1,13 @@
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://xcnsfjtsufywoloplzac.supabase.co";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   try {
-    const { chatId, role, content } = req.body;
+    const { chatId, role, content, userId } = req.body;
+    console.log("IN HERE");
 
     let objectId;
 
@@ -34,29 +40,43 @@ export default async function handler(req, res) {
       });
       return;
     }
+    // console.log("ABOUT TO GO INNNN")
+    // Fetch current messages
+    console.log(objectId);
+    const { data: currentData, error: fetchError } = await supabase
+      .from("chats")
+      .select("messages")
+      .eq("id", Number(objectId))
+      .eq("userID", userId)
+      .single();
+    console.log(currentData,fetchError);
+    if (fetchError) {
+      console.error("Error fetching current messages:", fetchError);
+      return;
+    }
 
-    const chat = await db.collection("chats").findOneAndUpdate(
-      {
-        _id: objectId,
-        userId: user.sub,
-      },
-      {
-        $push: {
-          messages: {
-            role,
-            content,
-          },
-        },
-      },
-      {
-        returnDocument: "after",
-      }
-    );
+    const { messages } = currentData;
+    const newMessage = { role, content };
+    const updatedMessages = [...messages, JSON.stringify(newMessage)];
+    console.log(updatedMessages);
+    // Update messages array
+    const { data, error } = await supabase
+      .from("chats")
+      .update({ messages: updatedMessages })
+      .eq("id", objectId)
+      .eq("userID", userId)
+      .select();
+
+    if (error) {
+      console.error("Error updating messages:", error);
+    } else {
+      console.log("Messages updated successfully:", data);
+    }
 
     res.status(200).json({
       chat: {
-        ...chat.value,
-        _id: chat.value._id.toString(),
+        ...data[0],
+        id: data[0].id,
       },
     });
   } catch (e) {

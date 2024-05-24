@@ -33,6 +33,7 @@ import Link from "next/link";
 // import { z } from "zod";
 
 import GoogleButton from "react-google-button";
+import Head from "next/head";
 
 const supabaseUrl = "https://xcnsfjtsufywoloplzac.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -82,6 +83,9 @@ export default function Login() {
 
   return (
     <div className="bg-gray-800 w-screen h-screen flex justify-center items-center">
+      <Head>
+        <title>Login - ClonedGPT</title>
+      </Head>
       <Card className="bg-white text-black w-1/2">
         <CardHeader className="flex items-center">
           <Image src="/logo1.png" width={100} height={100} alt=""></Image>
@@ -120,9 +124,7 @@ export default function Login() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <GoogleButton
-            onClick={() => handleSignIn()}
-          />
+          <GoogleButton onClick={() => handleSignIn()} />
         </CardFooter>
       </Card>
     </div>

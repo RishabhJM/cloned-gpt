@@ -29,6 +29,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import GoogleButton from "react-google-button";
+import Head from "next/head";
 
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { useForm } from "react-hook-form";
@@ -84,6 +85,9 @@ export default function Signup() {
   };
   return (
     <div className="bg-gray-800 w-screen h-screen flex justify-center items-center">
+      <Head>
+        <title>Signup - ClonedGPT</title>
+      </Head>
       <Card className="bg-white text-black w-1/2">
         <CardHeader className="flex items-center">
           <Image src="/logo1.png" width={100} height={100} alt=""></Image>

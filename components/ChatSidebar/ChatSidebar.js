@@ -43,7 +43,9 @@ export const ChatSidebar = ({ user, chatId }) => {
       setChatList(json?.chats || []);
     };
     loadChatList();
-  }, []);
+  }, [chatId]);
+  console.log(chatList);
+  console.log(chatId);
 
   return (
     <div className="flex flex-col overflow-hidden bg-gray-900 text-white">
@@ -59,7 +61,7 @@ export const ChatSidebar = ({ user, chatId }) => {
             key={chat.id}
             href={`/chat/${chat.id}`}
             className={`side-menu-item ${
-              chatId === chat._id ? "bg-gray-700 hover:bg-gray-800" : ""
+              chatId === chat.id ? "bg-gray-700 hover:bg-gray-700" : ""
             }`}
             // onClick={() => router.push(`/chat/${chat.id}`)}
           >
@@ -76,7 +78,7 @@ export const ChatSidebar = ({ user, chatId }) => {
           </Link>
         ))}
       </div>
-      <div className="flex">
+      <div className="flex py-4">
         <Image
           loader={() => src}
           src={src}

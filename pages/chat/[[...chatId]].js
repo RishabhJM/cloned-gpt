@@ -18,7 +18,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function ChatPage({ chatId, title, messages = [] }) {
-  // console.log("props: ", title, messages);
+  console.log("props: ", title, messages);
   const [user, setUser] = useState({});
   const [userId, setUserId] = useState({});
   const [newChatId, setNewChatId] = useState(null);
@@ -55,10 +55,11 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   // save the newly streamed message to new chat messages
   useEffect(() => {
     if (!routeHasChanged && !generatingResponse && fullMessage) {
+      console.log("NEW CHAT",newChatMessages);
       setNewChatMessages((prev) => [
         ...prev,
         {
-          _id: uuid(),
+          id: uuid(),
           role: "assistant",
           content: fullMessage,
         },
@@ -67,7 +68,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     }
   }, [generatingResponse, fullMessage, routeHasChanged]);
 
-  // if we've created a new chat
+  // if we've created a new chat, {WORKING}
   useEffect(() => {
     if (!generatingResponse && newChatId) {
       setNewChatId(null);
@@ -83,7 +84,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       const newChatMessages = [
         ...prev,
         {
-          _id: uuid(),
+          id: uuid(),
           role: "user",
           content: messageText,
         },
@@ -93,38 +94,28 @@ export default function ChatPage({ chatId, title, messages = [] }) {
     setMessageText("");
     console.log("MESSAGE_TEXT", messageText);
     //console.log("NEW CHAT: ", json);
-    const response = await fetch(`/api/chat/testChat`, {
+    const response = await fetch(`/api/chat/sendMessage`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ message: messageText }),
+      body: JSON.stringify({ message: messageText, userId: userId, chatId }),
     });
     const data = response.body;
+    console.log("DATA", data);
     const text = await response.json();
-    // console.log(text.output);
+    setNewChatId(text.chatId);
+    console.log("TEXT FE", text);
     if (!data) {
       return;
     }
-
-    // const reader = data.getReader();
-    // let content = "";
-    // await streamReader(reader, (message) => {
-    //   console.log("MESSAGE: ", message);
-    //   if (message.event === "newChatId") {
-    //     setNewChatId(message.content);
-    //   } else {
-    //     setIncomingMessage((s) => `${s}${message.content}`);
-    //     content = content + message.content;
-    //   }
-    // });
-    // console.log("READER",reader);
-    setFullMessage(text.output);
+    setFullMessage(text.response);
     setIncomingMessage("");
     setGeneratingResponse(false);
   };
 
   const allMessages = [...messages, ...newChatMessages];
+  console.log("ALL MESSAGES",allMessages);
 
   return (
     <>
@@ -196,10 +187,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
                     placeholder={generatingResponse ? "" : "Send a message..."}
                     className="w-full resize-none rounded-[12px] bg-gray-700 p-2 text-white focus:border-emerald-500 focus:bg-gray-600 focus:outline focus:outline-emerald-500"
                   />
-                  <button
-                    type="submit"
-                    className="btn"
-                  >
+                  <button type="submit" className="btn">
                     Send
                   </button>
                 </fieldset>
@@ -217,49 +205,34 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   );
 }
 
-// export const getServerSideProps = async (ctx) => {
-//   const chatId = ctx.params?.chatId?.[0] || null;
-//   if (chatId) {
-//     let objectId;
-
-//     try {
-//       objectId = new ObjectId(chatId);
-//     } catch (e) {
-//       return {
-//         redirect: {
-//           destination: "/chat",
-//         },
-//       };
-//     }
-
-//     const { user } = await getSession(ctx.req, ctx.res);
-//     const client = await clientPromise;
-//     const db = client.db("ChattyPete");
-//     const chat = await db.collection("chats").findOne({
-//       userId: user.sub,
-//       _id: objectId,
-//     });
-
-//     if (!chat) {
-//       return {
-//         redirect: {
-//           destination: "/chat",
-//         },
-//       };
-//     }
-
-//     return {
-//       props: {
-//         chatId,
-//         title: chat.title,
-//         messages: chat.messages.map((message) => ({
-//           ...message,
-//           _id: uuid(),
-//         })),
-//       },
-//     };
-//   }
-//   return {
-//     props: {},
-//   };
-// };
+export const getServerSideProps = async (ctx) => {
+  const chatId = ctx.params?.chatId?.[0] || null;
+  if (chatId) {
+    const { data, error } = await supabase
+      .from("chats")
+      .select()
+      .eq("id", chatId);
+    const messagesArray = data[0].messages.map((message) => (JSON.parse(message)));
+    console.log("DATA RJM",messagesArray);
+    if (!data) {
+      return {
+        redirect: {
+          destination: "/chat",
+        },
+      };
+    }
+    return {
+      props: {
+        chatId,
+        title: data[0].title,
+        messages: messagesArray.map((message) => ({
+          ...message,
+          id: uuid(),
+        })),
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};
