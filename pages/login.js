@@ -117,7 +117,7 @@ export default function Login() {
           </Button>
 
           <div className="text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-emerald-700">
               Sign Up
             </Link>

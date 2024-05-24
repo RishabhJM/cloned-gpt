@@ -44,8 +44,8 @@ export const ChatSidebar = ({ user, chatId }) => {
     };
     loadChatList();
   }, [chatId]);
-  console.log(chatList);
-  console.log(chatId);
+  // console.log(chatList);
+  // console.log(chatId);
 
   return (
     <div className="flex flex-col overflow-hidden bg-gray-900 text-white">
