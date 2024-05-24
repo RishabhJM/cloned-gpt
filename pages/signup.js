@@ -60,7 +60,7 @@ export default function Signup() {
       email: email,
       password: password,
       options: {
-        emailRedirectTo: "http://localhost:3000/chat",
+        emailRedirectTo: "https://cloned-gpt.vercel.app/chat",
       },
     });
     setEmail("");
@@ -72,7 +72,7 @@ export default function Signup() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/chat",
+        redirectTo: "https://cloned-gpt.vercel.app/chat",
       },
     });
   };
