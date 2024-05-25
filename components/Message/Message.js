@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown";
 
 export const Message = ({ user, role, content }) => {
   // console.log("USER: ", user);
-  const src = user?.user_metadata.avatar_url;
+  const src = user?.user_metadata.avatar_url || "/man.png";
   return (
     <div
       className={`grid grid-cols-[30px_1fr] gap-5 p-5 ${

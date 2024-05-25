@@ -1,39 +1,23 @@
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/router";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Label } from "@/components/ui/label";
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 
 import GoogleButton from "react-google-button";
 import Head from "next/head";
-
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useForm } from "react-hook-form";
-// import { z } from "zod";
 
 const supabaseUrl = "https://xcnsfjtsufywoloplzac.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -45,7 +29,6 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [showEmailText, setShowEmailText] = useState(false);
   supabase.auth.onAuthStateChange(async (event) => {
-    console.log(event);
     if (event === "INITIAL_SESSION") {
       // handle initial session
       console.log("SESSION INITIALIZED");

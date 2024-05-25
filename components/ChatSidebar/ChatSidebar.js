@@ -18,7 +18,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export const ChatSidebar = ({ user, chatId }) => {
   const [chatList, setChatList] = useState([]);
   const router = useRouter();
-  const src = user?.user_metadata.avatar_url;
+  const src = user?.user_metadata.avatar_url || "/man.png";
 
   // console.log(user);
 

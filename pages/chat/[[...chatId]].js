@@ -1,16 +1,11 @@
 import Head from "next/head";
-import { getSession } from "@auth0/nextjs-auth0";
-import { faRobot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { Message } from "@/components/Message";
 import { useRouter } from "next/router";
-import { streamReader } from "openai-edge-stream";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { BallTriangle } from "react-loader-spinner";
 
 const supabaseUrl = "https://xcnsfjtsufywoloplzac.supabase.co";
@@ -18,7 +13,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function ChatPage({ chatId, title, messages = [] }) {
-  console.log("props: ", title, messages);
+  // console.log("props: ", title, messages);
   const [user, setUser] = useState({});
   const [userId, setUserId] = useState({});
   const [newChatId, setNewChatId] = useState(null);
@@ -31,7 +26,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   const router = useRouter();
 
   const routeHasChanged = chatId !== originalChatId;
-  console.log(routeHasChanged);
+  // console.log(routeHasChanged);
 
   //gets logged in user data from supabase
   useEffect(() => {
@@ -57,11 +52,10 @@ export default function ChatPage({ chatId, title, messages = [] }) {
   // save the newly streamed message to new chat messages
   useEffect(() => {
     if (!routeHasChanged && !generatingResponse && fullMessage) {
-      console.log("NEW CHAT", newChatMessages);
       setNewChatMessages((prev) => [
         ...prev,
         {
-          _id: uuid(),
+          id: uuid(),
           role: "assistant",
           content: fullMessage,
         },
@@ -80,14 +74,14 @@ export default function ChatPage({ chatId, title, messages = [] }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("THE EVENT");
     setGeneratingResponse(true);
-    console.log(chatId);
     setOriginalChatId(chatId);
     setNewChatMessages((prev) => {
       const newChatMessages = [
         ...prev,
         {
-          _id: uuid(),
+          id: uuid(),
           role: "user",
           content: messageText,
         },
@@ -95,7 +89,7 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       return newChatMessages;
     });
     setMessageText("");
-    setIncomingMessage(messageText);
+
     const response = await fetch(`/api/chat/sendMessage`, {
       method: "POST",
       headers: {
@@ -104,18 +98,20 @@ export default function ChatPage({ chatId, title, messages = [] }) {
       body: JSON.stringify({ message: messageText, userId: userId, chatId }),
     });
     const data = response.body;
-    const text = await response.json();
-    setNewChatId(text.chatId);
     if (!data) {
       return;
     }
+    setIncomingMessage(messageText);
+    const text = await response.json();
+    setNewChatId(text.chatId);
+    console.log("EVENT 2");
     setFullMessage(text.response);
     setIncomingMessage("");
     setGeneratingResponse(false);
   };
 
   const allMessages = [...messages, ...newChatMessages];
-  // console.log("ALL MESSAGES",allMessages);
+  console.log("ALL MESSAGES",allMessages);
 
   return (
     <>
@@ -145,23 +141,24 @@ export default function ChatPage({ chatId, title, messages = [] }) {
               {!!allMessages.length && (
                 <div className="mb-auto">
                   {allMessages.map((message) => (
-                    <Message
-                      key={message._id}
-                      role={message.role}
-                      content={message.content}
-                      user={user}
-                    />
+                    <div>
+                      <Message
+                        key={message.id}
+                        role={message.role}
+                        content={message.content}
+                        user={user}
+                      />
+                    </div>
                   ))}
-                  {!!incomingMessage && (chatId) && (
+                  {!!incomingMessage && !routeHasChanged && (
                     <div>
                       RISHABH
                       <Message
-                      role="user"
-                      content={incomingMessage}
-                      user={user}
-                    />
+                        role="assistant"
+                        content={incomingMessage}
+                        user={user}
+                      />
                     </div>
-                    
                   )}
                   {!!incomingMessage && !!routeHasChanged && (
                     <Message
