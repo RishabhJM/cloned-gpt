@@ -141,14 +141,12 @@ export default function ChatPage({ chatId, title, messages = [] }) {
               {!!allMessages.length && (
                 <div className="mb-auto">
                   {allMessages.map((message) => (
-                    <div>
                       <Message
                         key={message.id}
                         role={message.role}
                         content={message.content}
                         user={user}
                       />
-                    </div>
                   ))}
                   {!!incomingMessage && !routeHasChanged && (
                     <div>
